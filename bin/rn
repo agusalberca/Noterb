@@ -12,5 +12,16 @@ $LOAD_PATH.unshift(File.absolute_path("#{__dir__}/../lib"))
 # Requiere `lib/rn.rb` como punto de partida para cargar todas las definiciones necesarias
 require 'rn'
 
+#Chequear que exista el cajon de notas
+if not Dir.exist?(File.join(Dir.home, "/.my_rns" ))
+  Dir.mkdir(File.join(Dir.home, "/.my_rns" ))
+  print("Dir .my_rns creado en ",Dir.home, "\n")
+end
+
+#chequear que exista book global(notas sin book)
+if not Dir.exist?(File.join(Dir.home, "/.my_rns/global" ))
+  Dir.mkdir(File.join(Dir.home, "/.my_rns/global" ))
+  print("Book global creado en ",Dir.home, ".my_rns/", "\n")
+end
 # Ejecuta, utilizando la gema dry-cli, los comandos que permiten utilizar la herramienta
 Dry::CLI.new(RN::Commands).call

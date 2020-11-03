@@ -12,7 +12,13 @@ module RN
         ]
 
         def call(name:, **)
-          warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if not Dir.exist?(File.join(Dir.home, "/.my_rns/#{name}"))
+            Dir.mkdir(File.join(Dir.home, "/.my_rns/#{name}"))
+            print ("BOOK CREATED: #{name} , PATH: "+ (File.join(Dir.home, "/.my_rns/", name )).to_s + "\n")
+          else
+            puts "Este libro ya existe"
+          end
+          # warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
@@ -30,7 +36,27 @@ module RN
 
         def call(name: nil, **options)
           global = options[:global]
-          warn "TODO: Implementar borrado del cuaderno de notas con nombre '#{name}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if global
+            Dir.each_child(File.join(Dir.home, "/.my_rns/global")) do |x|
+              arch=File.join(Dir.home, "/.my_rns/global/#{x}")
+              puts "#{x} DELETED, Path:#{arch}"
+              File.delete(arch)
+            end
+            puts "Las notas globales se han eliminado."
+          else
+            if name.nil?
+              puts "Debe ingresar un book a borrar."
+            else
+              arch=File.join(Dir.home, "/.my_rns/#{name}")
+              if File.exist?(arch)
+                puts "#{name} BOOK DELETED, Path:#{arch}"
+                Dir.delete(arch)
+              else
+                puts "#{name} BOOK NOT FOUND, Path:#{arch}"
+              end
+            end
+          end
+          # warn "TODO: Implementar borrado del cuaderno de notas con nombre '#{name}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
@@ -42,7 +68,8 @@ module RN
         ]
 
         def call(*)
-          warn "TODO: Implementar listado de los cuadernos de notas.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          Dir.each_child(File.join(Dir.home, "/.my_rns/")) {|x| puts x}
+          # warn "TODO: Implementar listado de los cuadernos de notas.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
@@ -59,7 +86,19 @@ module RN
         ]
 
         def call(old_name:, new_name:, **)
-          warn "TODO: Implementar renombrado del cuaderno de notas con nombre '#{old_name}' para que pase a llamarse '#{new_name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if Dir.exist?(File.join(Dir.home, "/.my_rns/#{old_name}"))
+            if not Dir.exist?(File.join(Dir.home, "/.my_rns/#{new_name}"))
+              old=File.join(Dir.home, "/.my_rns/#{old_name}")
+              new=File.join(Dir.home, "/.my_rns/#{new_name}")
+              File.rename(old,new)
+              puts "BOOK RENAMED: #{old_name} ->> #{new_name}"
+            else
+              puts "Book #{new_name} already exists."
+            end
+          else
+            puts "Book #{old_name} does not exist."
+          end
+          # warn "TODO: Implementar renombrado del cuaderno de notas con nombre '#{old_name}' para que pase a llamarse '#{new_name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
     end
