@@ -12,11 +12,16 @@ module RN
         ]
 
         def call(name:, **)
-          if not Dir.exist?(File.join(Dir.home, "/.my_rns/#{name}"))
-            Dir.mkdir(File.join(Dir.home, "/.my_rns/#{name}"))
-            print ("BOOK CREATED: #{name} , PATH: "+ (File.join(Dir.home, "/.my_rns/", name )).to_s + "\n")
+          if not name.include?(".")
+            path=RN::GlobalFunctions.basePath + "#{name}"
+              if not Dir.exist?(path)
+                Dir.mkdir(path)
+                print ("BOOK CREATED: #{name}, PATH: #{path}" + "\n")
+              else
+                puts "This book already exists."
+              end
           else
-            puts "Este libro ya existe"
+            puts "A book name cannot include \".\" "
           end
           # warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
@@ -37,23 +42,27 @@ module RN
         def call(name: nil, **options)
           global = options[:global]
           if global
-            Dir.each_child(File.join(Dir.home, "/.my_rns/global")) do |x|
-              arch=File.join(Dir.home, "/.my_rns/global/#{x}")
-              puts "#{x} DELETED, Path:#{arch}"
+            Dir.each_child(RN::GlobalFunctions.basePathGlobal) do |x|
+              arch=RN::GlobalFunctions.basePathGlobal + "#{x}"
+              puts "#{x} DELETED, PATH:#{arch}"
               File.delete(arch)
             end
-            puts "Las notas globales se han eliminado."
+            puts "All global notes have been deleted."
           else
-            if name.nil?
-              puts "Debe ingresar un book a borrar."
-            else
-              arch=File.join(Dir.home, "/.my_rns/#{name}")
-              if File.exist?(arch)
-                puts "#{name} BOOK DELETED, Path:#{arch}"
-                Dir.delete(arch)
+            if not name == "global"
+              if name.nil?
+                puts "A book name or --global must be provided."
               else
-                puts "#{name} BOOK NOT FOUND, Path:#{arch}"
+                arch=RN::GlobalFunctions.basePath + "#{name}"
+                if File.exist?(arch)
+                  puts "#{name} BOOK DELETED, PATH:#{arch}"
+                  Dir.delete(arch)
+                else
+                  puts "#{name}: BOOK NOT FOUND"
+                end
               end
+            else
+              puts "Global book cannot be deleted, to delete ALL global notes include --global in your options."
             end
           end
           # warn "TODO: Implementar borrado del cuaderno de notas con nombre '#{name}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
@@ -68,7 +77,7 @@ module RN
         ]
 
         def call(*)
-          Dir.each_child(File.join(Dir.home, "/.my_rns/")) {|x| puts x}
+          Dir.each_child(RN::GlobalFunctions.basePath) {|x| puts x}
           # warn "TODO: Implementar listado de los cuadernos de notas.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
@@ -86,17 +95,21 @@ module RN
         ]
 
         def call(old_name:, new_name:, **)
-          if Dir.exist?(File.join(Dir.home, "/.my_rns/#{old_name}"))
-            if not Dir.exist?(File.join(Dir.home, "/.my_rns/#{new_name}"))
-              old=File.join(Dir.home, "/.my_rns/#{old_name}")
-              new=File.join(Dir.home, "/.my_rns/#{new_name}")
-              File.rename(old,new)
-              puts "BOOK RENAMED: #{old_name} ->> #{new_name}"
+          old=RN::GlobalFunctions.basePath + "#{old_name}"
+          new=RN::GlobalFunctions.basePath + "#{new_name}"
+          if not old_name == "global"
+            if Dir.exist?(old)
+              if not Dir.exist?(new)
+                File.rename(old,new)
+                puts "BOOK RENAMED: #{old_name} ->> #{new_name}"
+              else
+                puts "Book #{new_name} already exists."
+              end
             else
-              puts "Book #{new_name} already exists."
+              puts "Book #{old_name} does not exist."
             end
           else
-            puts "Book #{old_name} does not exist."
+            puts "The global notebook cannot be renamed."
           end
           # warn "TODO: Implementar renombrado del cuaderno de notas con nombre '#{old_name}' para que pase a llamarse '#{new_name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
