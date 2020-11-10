@@ -166,8 +166,22 @@ module RN
         def call(**options)
           book = options[:book]
           global = options[:global]
-
-          # warn "TODO: Implementar listado de las notas del libro '#{book}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if book.nil? and (global == false)
+            Dir.each_child(RN::GlobalFunctions.basePath) do |each_dir|
+              Dir.each_child(RN::GlobalFunctions.basePath + each_dir){|note| puts "#{note}, BOOK: #{each_dir} "}
+            end
+          else
+            if not book.nil?
+              bookPath=RN::GlobalFunctions.basePath + book + "/"
+            else
+              bookPath=RN::GlobalFunctions.basePathGlobal
+              book="global"
+            end
+            if not Dir.exist?(bookPath)
+              abort "Book #{book} does not exist."
+            end
+            Dir.each_child(bookPath) {|note| puts "#{note}, BOOK: #{book} "}
+          end
         end
       end
 
@@ -185,7 +199,22 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar vista de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if not book.nil?
+            bookPath=RN::GlobalFunctions.basePath + book + "/"
+          else
+            bookPath=RN::GlobalFunctions.basePathGlobal
+            book="global"
+          end
+          if Dir.exist?(bookPath)
+            ntPath=bookPath + title +".rn"
+            if File.exist?(ntPath)
+              File.open(ntPath).each{|line| puts line}
+              else
+              abort "Note #{title} does not exist in book #{book}."
+            end
+          else
+            abort "Book #{book} does not exist."
+          end
         end
       end
     end

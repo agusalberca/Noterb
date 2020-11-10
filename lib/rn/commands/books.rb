@@ -12,7 +12,7 @@ module RN
         ]
 
         def call(name:, **)
-          if RN::Validators.valid_Name?(name)
+          if not RN::Validators.valid_Name?(name)
             abort "Book name contains forbidden character."
           end
           path=RN::GlobalFunctions.basePath + name
@@ -55,15 +55,14 @@ module RN
             else
               arch=RN::GlobalFunctions.basePath + name
               if File.exist?(arch)
+                FileUtils.rm_r(arch)
                 puts "#{name} BOOK DELETED, PATH:#{arch}"
-                Dir.delete(arch)
               else
                 abort "Book #{name} does not exist."
               end
             end
 
           end
-          # warn "TODO: Implementar borrado del cuaderno de notas con nombre '#{name}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
