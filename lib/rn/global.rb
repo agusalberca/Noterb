@@ -6,7 +6,10 @@ module RN
     def self.basePathGlobal
       return File.join(Dir.home, "/.my_rns/global/")
     end
-    def self.valid?(name)
+
+  end
+  module Validators
+    def self.valid_Name?(name)
       return (/[\W&&\S&&\D]+/ =~ name).nil?
     end
   end

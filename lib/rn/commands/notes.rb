@@ -15,35 +15,26 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          # puts /[\W&&\S&&\D]+/ =~ title
-          if RN::GlobalFunctions.valid?(title)
-            if book
-              bookPath=RN::GlobalFunctions.basePath + book + "/"
-              if Dir.exist?(bookPath)
-                ntPath=bookPath + title
-                if not File.exist?(ntPath)
-                  File.new(ntPath,"w")
-                  puts "FILE CREATED: #{title}, PATH: #{ntPath}"
-                else
-                  puts "Note #{title} already exists."
-                end
-              else
-                puts "Book #{book} does not exist."
-              end
+          if not RN::Validators.valid_Name?(title)
+            abort "Note title contains forbidden character."
+          end
+          if not book.nil?
+            bookPath=RN::GlobalFunctions.basePath + book + "/"
+          else
+            bookPath=RN::GlobalFunctions.basePathGlobal
+            book= "global"
+          end
+          if Dir.exist?(bookPath)
+            ntPath=bookPath + title +".rn"
+            if not File.exist?(ntPath)
+              File.new(ntPath,"w")
+              puts "NOTE CREATED: #{title}, BOOK: #{book}, PATH: #{ntPath}"
             else
-              ntPath=RN::GlobalFunctions.basePathGlobal + title
-              if not File.exist?(ntPath)
-                File.new(ntPath,"w")
-                puts "FILE CREATED: #{title}, PATH: #{ntPath}"
-              else
-                puts "Note #{title} already exists."
-              end
+              abort "Note #{title} already exists in book #{book}."
             end
           else
-            puts "Note title contains forbidden character."
+            abort "Book #{book} does not exist."
           end
-
-          # warn "TODO: Implementar creación de la nota con título '#{title}' (en el libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
@@ -61,8 +52,24 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar borrado de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
-        end
+          if not book.nil?
+            bookPath=RN::GlobalFunctions.basePath + book + "/"
+          else
+            bookPath=RN::GlobalFunctions.basePathGlobal
+            book= "global"
+          end
+          if Dir.exist?(bookPath)
+            ntPath=bookPath + title + ".rn"
+            if File.exist?(ntPath)
+              File.delete(ntPath)
+              puts "NOTE DELETED: #{title}, BOOK: #{book}, PATH: #{ntPath}"
+            else
+              abort "Note #{title} does not exist in book #{book}."
+            end
+          else
+            abort "Book #{book} does not exist."
+          end
+          end
       end
 
       class Edit < Dry::CLI::Command
@@ -79,7 +86,24 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar modificación de la nota con título '#{title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if not book.nil?
+            bookPath=RN::GlobalFunctions.basePath + book + "/"
+          else
+            bookPath=RN::GlobalFunctions.basePathGlobal
+            book= "global"
+          end
+          if Dir.exist?(bookPath)
+            ntPath=bookPath + title +".rn"
+            if File.exist?(ntPath)
+              editor = TTY::Editor.new()
+              editor.open(ntPath)
+              puts "NOTE EDITED: #{title}, PATH: #{ntPath}"
+            else
+              abort "Note #{title} does not exist in book #{book}."
+            end
+          else
+            abort "Book #{book} does not exist."
+          end
         end
       end
 
@@ -98,7 +122,31 @@ module RN
 
         def call(old_title:, new_title:, **options)
           book = options[:book]
-          warn "TODO: Implementar cambio del título de la nota con título '#{old_title}' hacia '#{new_title}' (del libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          if not RN::Validators.valid_Name?(new_title)
+            abort "Note title \"#{new_title}\" contains forbidden character."
+          end
+          if not book.nil?
+            bookPath=RN::GlobalFunctions.basePath + book + "/"
+          else
+            bookPath=RN::GlobalFunctions.basePathGlobal
+            book="global"
+          end
+          if Dir.exist?(bookPath)
+            ntPathOld=bookPath + old_title +".rn"
+            if File.exist?(ntPathOld)
+              ntPathNew=bookPath + new_title +".rn"
+              if not File.exist?(ntPathNew)
+                File.rename(ntPathOld,ntPathNew)
+                puts "NOTE RENAMED: #{old_title} ->> #{new_title}, PATH: #{ntPathNew}"
+              else
+                abort "Note #{new_title} already exists in book #{book}."
+              end
+            else
+              abort "Note #{old_title} does not exist in book #{book}."
+            end
+          else
+            abort "Book #{book} does not exist."
+          end
         end
       end
 
@@ -118,7 +166,8 @@ module RN
         def call(**options)
           book = options[:book]
           global = options[:global]
-          warn "TODO: Implementar listado de las notas del libro '#{book}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+
+          # warn "TODO: Implementar listado de las notas del libro '#{book}' (global=#{global}).\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
