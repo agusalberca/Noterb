@@ -6,5 +6,8 @@ module RN
     def self.basePathGlobal
       return File.join(Dir.home, "/.my_rns/global/")
     end
+    def self.valid?(name)
+      return (/[\W&&\S&&\D]+/ =~ name).nil?
+    end
   end
 end

@@ -12,16 +12,16 @@ module RN
         ]
 
         def call(name:, **)
-          if not name.include?(".")
-            path=RN::GlobalFunctions.basePath + "#{name}"
+          if RN::GlobalFunctions.valid?(name)
+            path=RN::GlobalFunctions.basePath + name
               if not Dir.exist?(path)
                 Dir.mkdir(path)
                 print ("BOOK CREATED: #{name}, PATH: #{path}" + "\n")
               else
-                puts "This book already exists."
+                abort "This book already exists."
               end
           else
-            puts "A book name cannot include \".\" "
+            abort "Book name contains forbidden character."
           end
           # warn "TODO: Implementar creación del cuaderno de notas con nombre '#{name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
@@ -43,7 +43,7 @@ module RN
           global = options[:global]
           if global
             Dir.each_child(RN::GlobalFunctions.basePathGlobal) do |x|
-              arch=RN::GlobalFunctions.basePathGlobal + "#{x}"
+              arch=RN::GlobalFunctions.basePathGlobal + x
               puts "#{x} DELETED, PATH:#{arch}"
               File.delete(arch)
             end
@@ -51,14 +51,14 @@ module RN
           else
             if not name == "global"
               if name.nil?
-                puts "A book name or --global must be provided."
+                abort "A book name or --global must be provided."
               else
-                arch=RN::GlobalFunctions.basePath + "#{name}"
+                arch=RN::GlobalFunctions.basePath + name
                 if File.exist?(arch)
                   puts "#{name} BOOK DELETED, PATH:#{arch}"
                   Dir.delete(arch)
                 else
-                  puts "#{name}: BOOK NOT FOUND"
+                  abort "#{name}: BOOK NOT FOUND"
                 end
               end
             else
@@ -95,21 +95,24 @@ module RN
         ]
 
         def call(old_name:, new_name:, **)
-          old=RN::GlobalFunctions.basePath + "#{old_name}"
-          new=RN::GlobalFunctions.basePath + "#{new_name}"
+          old=RN::GlobalFunctions.basePath + old_name
+          new=RN::GlobalFunctions.basePath + new_name
+          if not RN::GlobalFunctions.valid?(new_name)
+            abort "New name: #{new_name} contains invalid characters."
+          end
           if not old_name == "global"
             if Dir.exist?(old)
               if not Dir.exist?(new)
                 File.rename(old,new)
                 puts "BOOK RENAMED: #{old_name} ->> #{new_name}"
               else
-                puts "Book #{new_name} already exists."
+                abort "Book #{new_name} already exists."
               end
             else
-              puts "Book #{old_name} does not exist."
+              abort "Book #{old_name} does not exist."
             end
           else
-            puts "The global notebook cannot be renamed."
+            abort "The global notebook cannot be renamed."
           end
           # warn "TODO: Implementar renombrado del cuaderno de notas con nombre '#{old_name}' para que pase a llamarse '#{new_name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end

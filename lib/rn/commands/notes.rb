@@ -15,7 +15,35 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          warn "TODO: Implementar creación de la nota con título '#{title}' (en el libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          # puts /[\W&&\S&&\D]+/ =~ title
+          if RN::GlobalFunctions.valid?(title)
+            if book
+              bookPath=RN::GlobalFunctions.basePath + book + "/"
+              if Dir.exist?(bookPath)
+                ntPath=bookPath + title
+                if not File.exist?(ntPath)
+                  File.new(ntPath,"w")
+                  puts "FILE CREATED: #{title}, PATH: #{ntPath}"
+                else
+                  puts "Note #{title} already exists."
+                end
+              else
+                puts "Book #{book} does not exist."
+              end
+            else
+              ntPath=RN::GlobalFunctions.basePathGlobal + title
+              if not File.exist?(ntPath)
+                File.new(ntPath,"w")
+                puts "FILE CREATED: #{title}, PATH: #{ntPath}"
+              else
+                puts "Note #{title} already exists."
+              end
+            end
+          else
+            puts "Note title contains forbidden character."
+          end
+
+          # warn "TODO: Implementar creación de la nota con título '#{title}' (en el libro '#{book}').\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
         end
       end
 
