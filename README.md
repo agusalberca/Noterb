@@ -1,10 +1,10 @@
-# rn
+# Noterb
 
 Plantilla para comenzar con el Trabajo Práctico Integrador de la cursada 2020 de la materia
 Taller de Tecnologías de Producción de Software - Opción Ruby, de la Facultad de Informática
 de la Universidad Nacional de La Plata.
 
-Ruby Notes, o simplemente `rn`, es un gestor de notas concebido como un clon simplificado
+Noterb, o simplemente `rn`, es un gestor de notas concebido como un clon simplificado
 de la excelente herramienta [TomBoy](https://wiki.gnome.org/Apps/Tomboy).
 
 Este proyecto es simplemente una plantilla para comenzar a implementar la herramienta e
@@ -109,3 +109,21 @@ puede requerir algún trabajo adicional de tu parte.
   * `lib/rn/version.rb` define la versión de la herramienta, utilizando [SemVer](https://semver.org/lang/es/).
 * `bin/`: directorio donde reside cualquier archivo ejecutable, siendo el más notorio `rn`
   que se utiliza como punto de entrada para el uso de la herramienta.
+
+## Uso de la herramienta
+A grandes rasgos se podria decir que la herramienta se compone por dos grandes secciones:
+   * Books: Representa a un contenedor de notas. 
+   * Notes: Representa a cada una de las notas que va a persistir.
+---
+###Books
+Como se ha dicho previamente, los books representan contenedores de notas, podriamos darle un
+ nombre mas amigable, como cuaderno.
+Cada vez que en un comando se quiera hacer referencia a un cuaderno se va a utilizar la palabra
+clave `books`.
+```bash
+$ ruby bin/rn books comando1 [argumento1]
+```
+>En este caso, se esta ejecutando el `comando1` que pertenece a los cuadernos
+>que podria llevar el argumento opcional `argumento1`.
+>Con esto podemos ya irnos familiarizando con la sintaxis de Noterb.
+####Comandos
