@@ -43,7 +43,7 @@ module RN
             Dir.each_child(RN::GlobalFunctions.basePathGlobal) do |x|
               arch=RN::GlobalFunctions.basePathGlobal + x
               File.delete(arch)
-              puts "#{x} DELETED, PATH:#{arch}"
+              puts "NOTE DELETED: #{x}, PATH:#{arch}"
             end
             puts "All global notes have been deleted."
           else
@@ -56,7 +56,7 @@ module RN
               arch=RN::GlobalFunctions.basePath + name
               if File.exist?(arch)
                 FileUtils.rm_r(arch)
-                puts "#{name} BOOK DELETED, PATH:#{arch}"
+                puts "BOOK DELETED: #{name} , PATH:#{arch}"
               else
                 abort "Book #{name} does not exist."
               end

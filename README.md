@@ -115,15 +115,102 @@ A grandes rasgos se podria decir que la herramienta se compone por dos grandes s
    * Books: Representa a un contenedor de notas. 
    * Notes: Representa a cada una de las notas que va a persistir.
 ---
-###Books
+###Books 
 Como se ha dicho previamente, los books representan contenedores de notas, podriamos darle un
- nombre mas amigable, como cuaderno.
+ nombre mas amigable, como cuaderno. 
+ Por default existe un cuaderno global que va a contener todas las notas que no esten asignadas
+ a un cuaderno especifico.
 Cada vez que en un comando se quiera hacer referencia a un cuaderno se va a utilizar la palabra
-clave `books`.
+clave `books`. 
 ```bash
-$ ruby bin/rn books comando1 [argumento1]
+$ ruby bin/rn books comando1 [argumento1] [--opcion]
 ```
 >En este caso, se esta ejecutando el `comando1` que pertenece a los cuadernos
->que podria llevar el argumento opcional `argumento1`.
+>,que podria llevar el argumento opcional `argumento1` y la opcion `--opcion`.
 >Con esto podemos ya irnos familiarizando con la sintaxis de Noterb.
 ####Comandos
+   * `create :name`-> crea un nuevo cuaderno con nombre name
+   * `delete :name [--global]`-> elimina un cuaderno con nombre name. Opcional '--global'
+    elimina todas las notas del cuaderno global.
+   * `list`-> lista los cuadernos
+   * `rename :old_name :new_name`-> renombra el cuaderno old_name a new_name
+
+A continuacion, una breve ejemplificacion de los comandos recien nombrados.
+```bash
+$ ruby bin/rn books create "My book"
+>BOOK CREATED: My book, PATH: C:/Users/agusa/.my_rns/My book
+
+$ ruby bin/rn books delete "My book"
+>BOOK DELETED: My book, PATH:C:/Users/agusa/.my_rns/My book
+
+$ ruby bin/rn books delete --global
+>NOTE DELETED: globalNote1.rn, PATH:C:/Users/agusa/.my_rns/global/globalNote1.rn
+>NOTE DELETED: globalNote2.rn, PATH:C:/Users/agusa/.my_rns/global/globalNote2.rn
+>NOTE DELETED: globalNote3.rn, PATH:C:/Users/agusa/.my_rns/global/globalNote3.rn
+>All global notes have been deleted.
+
+$ ruby bin/rn books list
+>global
+>book
+>book2
+>book3
+
+$ ruby bin/rn books rename book book1
+>BOOK RENAMED: book ->> book1
+```
+---
+###Notes 
+Las notes representan al archivo que va a contener el conjunto de caracteres que represente a la
+nota en sí.
+ Por default las notas que no se asignen a un cuaderno se guardaran en el cuaderno 'global'.
+Cada vez que en un comando se quiera hacer referencia a una nota se va a utilizar la palabra
+clave `notes`. 
+```bash
+$ ruby bin/rn notes comando1 [argumento2] [--book cuaderno]
+```
+>En este caso, se esta ejecutando el `comando2` que pertenece a las notas
+>,que podria llevar el argumento opcional `argumento1` y la opcion `--book` con
+>valor 'cuaderno'.
+####Comandos
+Para todos los comandos de una nota existe la opcion `--book` que va a indicar en que cuaderno 
+se tiene que buscar la nota indicada. Por default esta opcion apunta al cuaderno global, es decir,
+cuando no se indique, se utilizara al cuaderno global.
+   * `create :title [--book]`-> crea una nueva nota con nombre title.
+   * `delete :title [--book]`-> elimina la nota con nombre title.
+   * `edit :title [--book]`-> inicia el gestor de texto por default del SO, que permite
+   editar el contenido de la nota title.
+   * `retitle :old_title :new_title [--book]`-> renombra la nota old_title a new_title.
+   * `list [--book] [--global]`-> Lista todas las notas del cajon. Si se especifica `--global` o
+   `--book`, lista las notas del cuaderno especificado.
+   * `show :title [--book]`-> Imprime la nota title.
+
+A continuacion, algunos ejemplos.
+```bash
+$ ruby bin/rn notes create globalNote
+>NOTE CREATED: globalNote, BOOK: global, PATH: C:/Users/agusa/.my_rns/global/globalNote.rn
+
+$ ruby bin/rn notes create globalNote --book book2
+>NOTE CREATED: globalNote, BOOK: book2, PATH: C:/Users/agusa/.my_rns/book2/globalNote.rn
+
+$ ruby bin/rn notes delete globalNote --book book2
+>NOTE DELETED: globalNote, BOOK: book2, PATH: C:/Users/agusa/.my_rns/book2/globalNote.rn
+
+$ ruby bin/rn notes edit globalNote
+>NOTE EDITED: globalNote, PATH: C:/Users/agusa/.my_rns/global/globalNote.rn
+
+$ ruby bin/rn notes retitle globalNote retitledNote
+>NOTE RENAMED: globalNote ->> retitledNote, PATH: C:/Users/agusa/.my_rns/global/retitledNote.rn
+
+$ ruby bin/rn notes list
+>note1.rn, BOOK: book1
+>note2.rn, BOOK: book2
+>retitledNote.rn, BOOK: global
+
+$ ruby bin/rn notes list --book book1
+>note1.rn, BOOK: book1
+>note11.rn, BOOK: book1
+>note111.rn, BOOK: book1
+
+$ ruby bin/rn notes show note1 --book book1
+>OMG! This is my "Hello World" note.
+```
