@@ -115,7 +115,7 @@ A grandes rasgos se podria decir que la herramienta se compone por dos grandes s
    * Books: Representa a un contenedor de notas. 
    * Notes: Representa a cada una de las notas que va a persistir.
 ---
-###Books 
+### Books 
 Como se ha dicho previamente, los books representan contenedores de notas, podriamos darle un
  nombre mas amigable, como cuaderno. 
  Por default existe un cuaderno global que va a contener todas las notas que no esten asignadas
@@ -128,7 +128,7 @@ $ ruby bin/rn books comando1 [argumento1] [--opcion]
 >En este caso, se esta ejecutando el `comando1` que pertenece a los cuadernos
 >,que podria llevar el argumento opcional `argumento1` y la opcion `--opcion`.
 >Con esto podemos ya irnos familiarizando con la sintaxis de Noterb.
-####Comandos
+#### Comandos
    * `create :name`-> crea un nuevo cuaderno con nombre name
    * `delete :name [--global]`-> elimina un cuaderno con nombre name. Opcional '--global'
     elimina todas las notas del cuaderno global.
@@ -159,7 +159,7 @@ $ ruby bin/rn books rename book book1
 >BOOK RENAMED: book ->> book1
 ```
 ---
-###Notes 
+### Notes 
 Las notes representan al archivo que va a contener el conjunto de caracteres que represente a la
 nota en sí.
  Por default las notas que no se asignen a un cuaderno se guardaran en el cuaderno 'global'.
@@ -171,7 +171,7 @@ $ ruby bin/rn notes comando1 [argumento2] [--book cuaderno]
 >En este caso, se esta ejecutando el `comando2` que pertenece a las notas
 >,que podria llevar el argumento opcional `argumento1` y la opcion `--book` con
 >valor 'cuaderno'.
-####Comandos
+#### Comandos
 Para todos los comandos de una nota existe la opcion `--book` que va a indicar en que cuaderno 
 se tiene que buscar la nota indicada. Por default esta opcion apunta al cuaderno global, es decir,
 cuando no se indique, se utilizara al cuaderno global.
@@ -214,3 +214,9 @@ $ ruby bin/rn notes list --book book1
 $ ruby bin/rn notes show note1 --book book1
 >OMG! This is my "Hello World" note.
 ```
+
+### Decisiones de diseño
+-Para la edicion de la nota se eligio usar la libreria tty-editor de Piotr Murach(https://rubygems.org/gems/tty-editor/versions/0.6.0)
+
+-Tanto en nombres de notas como de cuadernos no se permiten usar mas que letras, numeros y espacios. Así,
+a costas de personalizacion, se asegura que funcione en diferentes SO.
