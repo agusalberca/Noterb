@@ -15,26 +15,7 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          if not RN::Validators.valid_Name?(title)
-            abort "Note title contains forbidden character."
-          end
-          if not book.nil?
-            bookPath=RN::GlobalFunctions.basePath + book + "/"
-          else
-            bookPath=RN::GlobalFunctions.basePathGlobal
-            book= "global"
-          end
-          if Dir.exist?(bookPath)
-            ntPath=bookPath + title +".rn"
-            if not File.exist?(ntPath)
-              File.new(ntPath,"w")
-              puts "NOTE CREATED: #{title}, BOOK: #{book}, PATH: #{ntPath}"
-            else
-              abort "Note #{title} already exists in book #{book}."
-            end
-          else
-            abort "Book #{book} does not exist."
-          end
+          Note.new(title, book).create
         end
       end
 
@@ -52,26 +33,9 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          if not book.nil?
-            bookPath=RN::GlobalFunctions.basePath + book + "/"
-          else
-            bookPath=RN::GlobalFunctions.basePathGlobal
-            book= "global"
-          end
-          if Dir.exist?(bookPath)
-            ntPath=bookPath + title + ".rn"
-            if File.exist?(ntPath)
-              File.delete(ntPath)
-              puts "NOTE DELETED: #{title}, BOOK: #{book}, PATH: #{ntPath}"
-            else
-              abort "Note #{title} does not exist in book #{book}."
-            end
-          else
-            abort "Book #{book} does not exist."
-          end
-          end
+          Note.new(title,book).delete
+        end
       end
-
       class Edit < Dry::CLI::Command
         desc 'Edit the content a note'
 
@@ -86,24 +50,7 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          if not book.nil?
-            bookPath=RN::GlobalFunctions.basePath + book + "/"
-          else
-            bookPath=RN::GlobalFunctions.basePathGlobal
-            book= "global"
-          end
-          if Dir.exist?(bookPath)
-            ntPath=bookPath + title +".rn"
-            if File.exist?(ntPath)
-              editor = TTY::Editor.new()
-              editor.open(ntPath)
-              puts "NOTE EDITED: #{title}, PATH: #{ntPath}"
-            else
-              abort "Note #{title} does not exist in book #{book}."
-            end
-          else
-            abort "Book #{book} does not exist."
-          end
+          Note.new(title,book).edit
         end
       end
 
@@ -122,31 +69,7 @@ module RN
 
         def call(old_title:, new_title:, **options)
           book = options[:book]
-          if not RN::Validators.valid_Name?(new_title)
-            abort "Note title \"#{new_title}\" contains forbidden character."
-          end
-          if not book.nil?
-            bookPath=RN::GlobalFunctions.basePath + book + "/"
-          else
-            bookPath=RN::GlobalFunctions.basePathGlobal
-            book="global"
-          end
-          if Dir.exist?(bookPath)
-            ntPathOld=bookPath + old_title +".rn"
-            if File.exist?(ntPathOld)
-              ntPathNew=bookPath + new_title +".rn"
-              if not File.exist?(ntPathNew)
-                File.rename(ntPathOld,ntPathNew)
-                puts "NOTE RENAMED: #{old_title} ->> #{new_title}, PATH: #{ntPathNew}"
-              else
-                abort "Note #{new_title} already exists in book #{book}."
-              end
-            else
-              abort "Note #{old_title} does not exist in book #{book}."
-            end
-          else
-            abort "Book #{book} does not exist."
-          end
+          Note.new(old_title,book).retitle(new_title)
         end
       end
 
@@ -166,21 +89,11 @@ module RN
         def call(**options)
           book = options[:book]
           global = options[:global]
-          if book.nil? and (global == false)
-            Dir.each_child(RN::GlobalFunctions.basePath) do |each_dir|
-              Dir.each_child(RN::GlobalFunctions.basePath + each_dir){|note| puts "#{note}, BOOK: #{each_dir} "}
-            end
+          if book.nil? and !global
+            puts Note.all
           else
-            if not book.nil?
-              bookPath=RN::GlobalFunctions.basePath + book + "/"
-            else
-              bookPath=RN::GlobalFunctions.basePathGlobal
-              book="global"
-            end
-            if not Dir.exist?(bookPath)
-              abort "Book #{book} does not exist."
-            end
-            Dir.each_child(bookPath) {|note| puts "#{note}, BOOK: #{book} "}
+            list_book=book.nil? ? Book.globalBook : book
+            puts Note.all(list_book)
           end
         end
       end
@@ -199,22 +112,7 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          if not book.nil?
-            bookPath=RN::GlobalFunctions.basePath + book + "/"
-          else
-            bookPath=RN::GlobalFunctions.basePathGlobal
-            book="global"
-          end
-          if Dir.exist?(bookPath)
-            ntPath=bookPath + title +".rn"
-            if File.exist?(ntPath)
-              File.open(ntPath).each{|line| puts line}
-              else
-              abort "Note #{title} does not exist in book #{book}."
-            end
-          else
-            abort "Book #{book} does not exist."
-          end
+          Note.new(title,book).show_note
         end
       end
     end

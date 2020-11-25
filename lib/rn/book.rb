@@ -5,7 +5,7 @@ module RN
 
     attr_accessor :name
 
-    def self.global_existence
+    def self.global_existence?
       # chequear que exista book global(notas sin book)
       unless Dir.exist?("#{PathFunctions.basePath}/global")
         Dir.mkdir("#{PathFunctions.basePath}/global")
@@ -13,7 +13,7 @@ module RN
       end
     end
 
-    def self.globalBook()
+    def self.globalBook
       new GLOBAL_BOOK_NAME
     end
 
@@ -44,7 +44,7 @@ module RN
       unless RN::Validators.valid_Name?(self.name)
         abort 'Book name contains forbidden character.'
       end
-      if not Dir.exist?(path)
+      if !Dir.exist?(path)
         Dir.mkdir(path)
         print ("BOOK CREATED: #{name}, PATH: #{path} \n")
       else
@@ -78,7 +78,9 @@ module RN
       if Dir.exist?(path)
         if !Dir.exist?("#{PathFunctions.basePath}#{new_name}/")
           File.rename(path, "#{PathFunctions.basePath}#{new_name}/")
-          puts "BOOK RENAMED: #{name} ->> #{new_name}"
+          old_name=name
+          name=new_name
+          puts "BOOK RENAMED: #{old_name} ->> #{name}"
         else
           abort "Book #{new_name} already exists."
         end
