@@ -10,18 +10,8 @@ module RN
           '"My book" # Creates a new book named "My book"',
           'Memoires  # Creates a new book named "Memoires"'
         ]
-
         def call(name:, **)
-          if not RN::Validators.valid_Name?(name)
-            abort "Book name contains forbidden character."
-          end
-          path=RN::GlobalFunctions.basePath + name
-            if not Dir.exist?(path)
-              Dir.mkdir(path)
-              print ("BOOK CREATED: #{name}, PATH: #{path}" + "\n")
-            else
-              abort "This book already exists."
-            end
+          Book.new(name).create
         end
       end
 
@@ -39,30 +29,22 @@ module RN
 
         def call(name: nil, **options)
           global = options[:global]
-          if global
-            Dir.each_child(RN::GlobalFunctions.basePathGlobal) do |x|
-              arch=RN::GlobalFunctions.basePathGlobal + x
-              File.delete(arch)
-              puts "NOTE DELETED: #{x}, PATH:#{arch}"
-            end
-            puts "All global notes have been deleted."
-          else
-            if name == "global"
-              abort "Global book cannot be deleted, to delete ALL global notes include --global in your options."
-            end
-            if name.nil?
-              abort "A book name or --global must be provided."
-            else
-              arch=RN::GlobalFunctions.basePath + name
-              if File.exist?(arch)
-                FileUtils.rm_r(arch)
-                puts "BOOK DELETED: #{name} , PATH:#{arch}"
-              else
-                abort "Book #{name} does not exist."
-              end
-            end
-
+          if global && (not name.nil?)
+            abort 'Argument & option conflict. Avoid using them simultaneously.'
           end
+          if global
+            book = 'global'
+          else
+            if not name.nil?
+              if name == 'global'
+                abort 'Global book cannot be deleted, to delete ALL global notes include --global in your options.'
+              end
+              book = name
+            else
+              abort 'A name or --global must be provided.'
+            end
+          end
+          Book.new(book).delete
         end
       end
 
@@ -73,8 +55,7 @@ module RN
           '          # Lists every available book'
         ]
         def call(*)
-          Dir.each_child(RN::GlobalFunctions.basePath) {|x| puts x}
-          # warn "TODO: Implementar listado de los cuadernos de notas.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          Book.all.map { |each| puts each }
         end
       end
 
@@ -91,26 +72,7 @@ module RN
         ]
 
         def call(old_name:, new_name:, **)
-          old=RN::GlobalFunctions.basePath + old_name
-          new=RN::GlobalFunctions.basePath + new_name
-          if not RN::Validators.valid_Name?(new_name)
-            abort "New name: #{new_name} contains invalid characters."
-          end
-          if old_name == "global"
-            abort "The global notebook cannot be renamed."
-          end
-          if Dir.exist?(old)
-            if not Dir.exist?(new)
-              File.rename(old,new)
-              puts "BOOK RENAMED: #{old_name} ->> #{new_name}"
-            else
-              abort "Book #{new_name} already exists."
-            end
-          else
-            abort "Book #{old_name} does not exist."
-          end
-
-          # warn "TODO: Implementar renombrado del cuaderno de notas con nombre '#{old_name}' para que pase a llamarse '#{new_name}'.\nPodés comenzar a hacerlo en #{__FILE__}:#{__LINE__}."
+          Book.new(old_name).rename(new_name)
         end
       end
     end
