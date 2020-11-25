@@ -1,5 +1,6 @@
 module RN
   class Note
+    include PathFunctions
     attr_accessor :title, :book
 
     def self.all(book = '*')

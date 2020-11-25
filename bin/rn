@@ -13,11 +13,7 @@ $LOAD_PATH.unshift(File.absolute_path("#{__dir__}/../lib"))
 require 'rn'
 require 'tty-editor'
 
-#Chequear que exista el cajon de notas
-if not Dir.exist?(File.join(Dir.home, "/.my_rns" ))
-  Dir.mkdir(File.join(Dir.home, "/.my_rns" ))
-  print("Dir .my_rns creado en ",Dir.home, "\n")
-end
+
 
 
 # Ejecuta, utilizando la gema dry-cli, los comandos que permiten utilizar la herramienta

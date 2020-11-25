@@ -5,14 +5,6 @@ module RN
 
     attr_accessor :name
 
-    def self.global_existence?
-      # chequear que exista book global(notas sin book)
-      unless Dir.exist?("#{PathFunctions.basePath}/global")
-        Dir.mkdir("#{PathFunctions.basePath}/global")
-        print("Book global creado en #{PathFunctions.basePath}/global")
-      end
-    end
-
     def self.globalBook
       new GLOBAL_BOOK_NAME
     end
