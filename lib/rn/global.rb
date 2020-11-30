@@ -16,10 +16,8 @@ module RN
       Dir.mkdir("#{self.basePath}global")
       puts "Book global creado en #{self.basePath}global"
     end
-
-
-
   end
+
   module Validators
     def self.valid_Name?(name)
       return (/[\W&&\S&&\D]+/ =~ name).nil?

@@ -115,6 +115,28 @@ module RN
           Note.new(title,book).show_note
         end
       end
+
+      class Export < Dry::CLI::Command
+        desc 'Show a note'
+
+        argument :title, required: false, desc: 'Title of the note'
+        option :book, type: :string, desc: 'Book'
+
+        example [
+                    'todo                        # Exports a note titled "todo" from the global book',
+                    '"New note" --book "My book" # Exports a note titled "New note" from the book "My book"',
+                    'thoughts --book Memoires    # Exports a note titled "thoughts" from the book "Memoires"'
+                ]
+
+        def call(title: nil, **options)
+          book = options[:book]
+          if book.nil? and title.nil?
+            Note.export_all
+          else
+            Note.new(title,book).export
+          end
+        end
+      end
     end
   end
 end

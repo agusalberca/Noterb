@@ -1,6 +1,7 @@
 module RN
   class Note
     include PathFunctions
+    require 'redcarpet'
     attr_accessor :title, :book
 
     def self.all(book = '*')
@@ -9,8 +10,23 @@ module RN
       end
     end
 
+    def self.all_paths
+      Dir["#{PathFunctions.basePath}*/*"].select { |e| File.file?(e) }
+    end
+
+    def self.export_all
+      all_paths.map do | path |
+        book = File.dirname(path).split('/').last
+        Note.new(File.basename(path,".*"), book).export
+      end
+    end
+
     def path
       "#{book.path}#{title}.rn"
+    end
+
+    def no_extention_path
+      "#{book.path}#{title}"
     end
 
     def initialize(note_title, book = nil)
@@ -85,6 +101,31 @@ module RN
       if Dir.exist?(book.path)
         if File.exist?(path)
           File.open(path).each { |line| puts line}
+        else
+          abort "Note #{title} does not exist in book #{book.name}."
+        end
+      else
+        abort "Book #{book.name} does not exist."
+      end
+    end
+
+    def convert
+      content = File.read(Dir["#{no_extention_path}.*"][0])
+      md=Redcarpet::Markdown.new(Redcarpet::Render::HTML,tables: true)
+      md.render(content)
+    end
+
+    def export(export_path = "#{book.path}.exported/")
+      if Dir.exist?(book.path)
+        if File.exist?(Dir["#{no_extention_path}.*"][0])
+          if !File.exist?("#{export_path}#{title}.html")
+            md = convert
+            Dir.mkdir(export_path) unless Dir.exist?(export_path)
+            File.open("#{export_path}#{title}.html", 'w') { |file| file.write md }
+            puts "NOTE EXPORTED: #{title}, PATH: #{export_path}#{title}.html"
+          else
+            puts "File #{title} already exported. PATH: #{export_path}#{title}.html"
+          end
         else
           abort "Note #{title} does not exist in book #{book.name}."
         end
