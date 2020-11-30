@@ -183,6 +183,8 @@ cuando no se indique, se utilizara al cuaderno global.
    * `list [--book] [--global]`-> Lista todas las notas del cajon. Si se especifica `--global` o
    `--book`, lista las notas del cuaderno especificado.
    * `show :title [--book]`-> Imprime la nota title.
+   * `export [:title] [--book]`-> Exporta todas las notas a formato html. Si se indica :title,
+   solo se exporta la nota con tal nombre.
 
 A continuacion, algunos ejemplos.
 ```bash
@@ -213,10 +215,19 @@ $ ruby bin/rn notes list --book book1
 
 $ ruby bin/rn notes show note1 --book book1
 >OMG! This is my "Hello World" note.
+
+$ ruby bin/rn notes export
+>NOTE EXPORTED: note1, PATH: C:/Users/agusa/.my_rns/book1/.exported/note1.html
+>File note3 already exported. PATH: C:/Users/agusa/.my_rns/book3/.exported/note3.html
+
+$ ruby bin/rn notes export note1 --book book1
+>NOTE EXPORTED: note1, PATH: C:/Users/agusa/.my_rns/book1/.exported/note1.html
 ```
 
 ### Decisiones de diseño
--Para la edicion de la nota se eligio usar la libreria tty-editor de Piotr Murach(https://rubygems.org/gems/tty-editor/versions/0.6.0)
+-Para la edicion de la nota se eligio usar la libreria [tty-editor](https://rubygems.org/gems/tty-editor/versions/0.6.0) de Piotr Murach
 
 -Tanto en nombres de notas como de cuadernos no se permiten usar mas que letras, numeros y espacios. Así,
 a costas de personalizacion, se asegura que funcione en diferentes SO.
+
+-Para el parseo de una nota de texto rico a HTML se utilizó la libreria [Redcarpet](https://rubygems.org/gems/redcarpet/versions/3.5.0) de Natacha Porté y Vicent Martí.
