@@ -134,6 +134,8 @@ $ ruby bin/rn books comando1 [argumento1] [--opcion]
     elimina todas las notas del cuaderno global.
    * `list`-> lista los cuadernos
    * `rename :old_name :new_name`-> renombra el cuaderno old_name a new_name
+   * `export :name [--global]`-> exporta las notas de un cuaderno con nombre name. Opcional '--global'
+   exporta todas las notas del cuaderno global
 
 A continuacion, una breve ejemplificacion de los comandos recien nombrados.
 ```bash
@@ -157,6 +159,12 @@ $ ruby bin/rn books list
 
 $ ruby bin/rn books rename book book1
 >BOOK RENAMED: book ->> book1
+
+$ ruby bin/rn books export book1
+>NOTE EXPORTED: note1, PATH: C:/Users/agusa/.my_rns/book1/.exported/note1.html
+>NOTE EXPORTED: note11, PATH: C:/Users/agusa/.my_rns/book1/.exported/note11.html
+>NOTE EXPORTED: note111, PATH: C:/Users/agusa/.my_rns/book1/.exported/note111.html
+>BOOK: book1 -> finished exporting process.
 ```
 ---
 ### Notes 
