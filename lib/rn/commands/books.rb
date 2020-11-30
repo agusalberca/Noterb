@@ -75,6 +75,39 @@ module RN
           Book.new(old_name).rename(new_name)
         end
       end
+
+      class Export < Dry::CLI::Command
+        desc 'Export a book'
+
+        argument :name, required: false, desc: 'Name of the book'
+        option :global, type: :boolean, default: false, desc: 'Operate on the global book'
+
+        example [
+                    '--global  # Exports all notes from the global book',
+                    '"My book" # Exports all notes from book named "My book"',
+                    'Memoires  # Exports all notes from book named "Memoires"'
+                ]
+
+        def call(name: nil, **options)
+          global = options[:global]
+          if global && (not name.nil?)
+            abort 'Argument & option conflict. Avoid using them simultaneously.'
+          end
+          if global
+            book = 'global'
+          else
+            if not name.nil?
+              if name == 'global'
+                abort 'Global book cannot be deleted, to delete ALL global notes include --global in your options.'
+              end
+              book = name
+            else
+              abort 'A name or --global must be provided.'
+            end
+          end
+          Book.new(book).export
+        end
+      end
     end
   end
 end

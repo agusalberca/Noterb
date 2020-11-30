@@ -117,7 +117,7 @@ module RN
       end
 
       class Export < Dry::CLI::Command
-        desc 'Show a note'
+        desc 'Export notes'
 
         argument :title, required: false, desc: 'Title of the note'
         option :book, type: :string, desc: 'Book'

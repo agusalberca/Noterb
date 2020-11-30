@@ -80,5 +80,10 @@ module RN
         abort "Book #{name} does not exist."
       end
     end
+
+    def export
+      Note.export_from_book(name)
+      puts "BOOK: #{name} -> finished exporting process."
+    end
   end
 end

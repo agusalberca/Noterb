@@ -10,14 +10,21 @@ module RN
       end
     end
 
-    def self.all_paths
-      Dir["#{PathFunctions.basePath}*/*"].select { |e| File.file?(e) }
+    def self.all_paths(book = '*')
+      Dir["#{PathFunctions.basePath}#{book}/*"].select { |e| File.file?(e) }
     end
 
     def self.export_all
       all_paths.map do | path |
         book = File.dirname(path).split('/').last
-        Note.new(File.basename(path,".*"), book).export
+        Note.new(File.basename(path,'.*'), book).export
+      end
+    end
+
+    def self.export_from_book(book)
+      all_paths(book).map do | path |
+        book = File.dirname(path).split('/').last
+        Note.new(File.basename(path,'.*'), book).export
       end
     end
 
