@@ -15,7 +15,12 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          Note.new(title, book).create
+          abort 'Note title contains forbidden character.' unless RN::Validators.valid_Name?(title)
+          work_note = Note.new(title, book)
+          abort "Book #{work_note.book.name} does not exist." unless Dir.exist?(work_note.book.path)
+          abort "Note #{title} already exists in book #{work_note.book.name}." if File.exist?(work_note.path)
+          work_note.create
+          puts "NOTE CREATED: #{title}, BOOK: #{work_note.book.name}, PATH: #{work_note.path}"
         end
       end
 
@@ -33,7 +38,11 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          Note.new(title,book).delete
+          work_note = Note.new(title, book)
+          abort "Book #{book.name} does not exist." unless Dir.exist?(work_note.book.path)
+          abort "Note #{title} does not exist in book #{work_note.book.name}." unless File.exist?(work_note.path)
+          work_note.delete
+          puts "NOTE DELETED: #{title}, BOOK: #{work_note.book.name}, PATH: #{work_note.path}"
         end
       end
       class Edit < Dry::CLI::Command
@@ -50,7 +59,11 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          Note.new(title,book).edit
+          work_note = Note.new(title, book)
+          abort "Book #{work_note.book.name} does not exist." unless Dir.exist?(work_note.book.path)
+          abort "Note #{title} does not exist in book #{work_note.book.name}." unless File.exist?(work_note.path)
+          work_note.edit
+          puts "NOTE EDITED: #{title}, PATH: #{work_note.path}"
         end
       end
 
@@ -69,7 +82,13 @@ module RN
 
         def call(old_title:, new_title:, **options)
           book = options[:book]
-          Note.new(old_title,book).retitle(new_title)
+          abort "Note title \"#{new_title}\" contains forbidden character." unless RN::Validators.valid_Name?(new_title)
+          work_note = Note.new(old_title, book)
+          abort "Book #{work_note.book.name} does not exist." unless Dir.exist?(work_note.book.path)
+          abort "Note #{work_note.title} does not exist in book #{work_note.book.name}." unless File.exist?(work_note.path)
+          abort "Note #{new_title} already exists in book #{work_note.book.name}." if  File.exist?("#{work_note.book.path}#{new_title}.rn")
+          work_note.retitle(new_title)
+          puts "NOTE RETITLED: #{old_title} ->> #{new_title}, PATH: #{work_note.path}"
         end
       end
 
@@ -112,7 +131,10 @@ module RN
 
         def call(title:, **options)
           book = options[:book]
-          Note.new(title,book).show_note
+          work_note = Note.new(title, book)
+          abort "Book #{work_note.book.name} does not exist." unless Dir.exist?(work_note.book.path)
+          abort "Note #{title} does not exist in book #{work_note.book.name}." unless File.exist?(work_note.path)
+          work_note.show_note
         end
       end
 
@@ -130,10 +152,18 @@ module RN
 
         def call(title: nil, **options)
           book = options[:book]
+
           if book.nil? and title.nil?
             Note.export_all
+            puts "All notes have been exported."
           else
-            Note.new(title,book).export
+            work_note = Note.new(title, book)
+            export_path = "#{work_note.book.path}.exported/"
+            abort "Book #{work_note.book.name} does not exist." unless Dir.exist?(work_note.book.path)
+            abort "Note #{title} does not exist in book #{work_note.book.name}." unless File.exist?(Dir["#{work_note.no_extention_path}.*"][0])
+            puts "File #{title} already exported. PATH: #{export_path}#{title}.html" if File.exist?("#{export_path}#{title}.html")
+            work_note.export
+            puts "NOTE EXPORTED: #{title}, PATH: #{export_path}#{title}.html"
           end
         end
       end

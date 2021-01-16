@@ -11,7 +11,15 @@ module RN
           'Memoires  # Creates a new book named "Memoires"'
         ]
         def call(name:, **)
-          Book.new(name).create
+          unless RN::Validators.valid_Name?(name)
+            abort 'Book name contains forbidden character.'
+          end
+          new_book = Book.new(name)
+          if Dir.exist?(new_book.path)
+            abort 'This book already exists.'
+          end
+          new_book.create
+          print ("BOOK CREATED: #{new_book.name}, PATH: #{new_book.path} \n")
         end
       end
 
@@ -32,19 +40,26 @@ module RN
           if global && (not name.nil?)
             abort 'Argument & option conflict. Avoid using them simultaneously.'
           end
+          work_book = Book.new(name)
+          unless File.exist?(work_book.path)
+            abort "Book #{name} does not exist."
+          end
+
           if global
             book = 'global'
+            puts 'All global notes have been deleted.'
           else
             if not name.nil?
               if name == 'global'
                 abort 'Global book cannot be deleted, to delete ALL global notes include --global in your options.'
               end
               book = name
+              puts "BOOK DELETED: #{name} , PATH:#{work_book.path}"
             else
               abort 'A name or --global must be provided.'
             end
           end
-          Book.new(book).delete
+          work_book.delete
         end
       end
 
@@ -72,7 +87,15 @@ module RN
         ]
 
         def call(old_name:, new_name:, **)
-          Book.new(old_name).rename(new_name)
+          work_book = Book.new(old_name)
+          unless RN::Validators.valid_Name?(new_name)
+            abort "New name: #{new_name} contains invalid characters."
+          end
+          abort 'The global notebook cannot be renamed.' if old_name == 'global'
+          abort "Book #{work_book.name} does not exist." unless Dir.exist?(work_book.path)
+          abort "Book #{new_name} already exists." if Dir.exist?("#{PathFunctions.basePath}#{new_name}/")
+          work_book.rename(new_name)
+          puts "BOOK RENAMED: #{old_name} ->> #{work_book.name}"
         end
       end
 
@@ -106,6 +129,7 @@ module RN
             end
           end
           Book.new(book).export
+          puts "BOOK: #{name} -> finished exporting process."
         end
       end
     end

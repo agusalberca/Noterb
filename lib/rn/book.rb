@@ -33,15 +33,8 @@ module RN
     end
 
     def create
-      unless RN::Validators.valid_Name?(self.name)
-        abort 'Book name contains forbidden character.'
-      end
-      if !Dir.exist?(path)
-        Dir.mkdir(path)
-        print ("BOOK CREATED: #{name}, PATH: #{path} \n")
-      else
-        abort 'This book already exists.'
-      end
+      Dir.mkdir(path) unless Dir.exist?(path)
+      # print ("BOOK CREATED: #{name}, PATH: #{path} \n")
     end
 
     def delete
@@ -49,41 +42,28 @@ module RN
         Dir.each_child(path) do |x|
           arch = "#{path}/#{x}"
           File.delete(arch)
-          puts "NOTE DELETED: #{x}, PATH:#{arch}"
+          # puts "NOTE DELETED: #{x}, PATH:#{arch}"
         end
-        puts 'All global notes have been deleted.'
+        # puts 'All global notes have been deleted.'
       elsif File.exist?(path)
         FileUtils.rm_r(path)
-        puts "BOOK DELETED: #{name} , PATH:#{path}"
-      else
-        abort "Book #{name} does not exist."
+        # puts "BOOK DELETED: #{name} , PATH:#{path}"
       end
     end
 
     def rename(new_name)
-      if !RN::Validators.valid_Name?(new_name)
-        abort "New name: #{new_name} contains invalid characters."
-      end
-      if name == 'global'
-        abort 'The global notebook cannot be renamed.'
-      end
+      abort if name == 'global'
       if Dir.exist?(path)
-        if !Dir.exist?("#{PathFunctions.basePath}#{new_name}/")
+        unless Dir.exist?("#{PathFunctions.basePath}#{new_name}/")
           File.rename(path, "#{PathFunctions.basePath}#{new_name}/")
-          old_name=name
-          name=new_name
-          puts "BOOK RENAMED: #{old_name} ->> #{name}"
-        else
-          abort "Book #{new_name} already exists."
+          self.name = new_name
         end
-      else
-        abort "Book #{name} does not exist."
       end
     end
 
     def export
       Note.export_from_book(name)
-      puts "BOOK: #{name} -> finished exporting process."
+      # puts "BOOK: #{name} -> finished exporting process."
     end
   end
 end

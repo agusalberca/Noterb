@@ -42,78 +42,26 @@ module RN
     end
 
     def create
-      if !RN::Validators.valid_Name?(title)
-        abort 'Note title contains forbidden character.'
-      end
-      if Dir.exist?(book.path)
-        if !File.exist?(path)
-          File.new(path,'w')
-          puts "NOTE CREATED: #{title}, BOOK: #{book.name}, PATH: #{path}"
-        else
-          abort "Note #{title} already exists in book #{book.name}."
-        end
-      else
-        abort "Book #{book.name} does not exist."
-      end
+      File.new(path, 'w') unless File.exist?(path)
     end
+
     def delete
-      if Dir.exist?(book.path)
-        if File.exist?(path)
-          File.delete(path)
-          puts "NOTE DELETED: #{title}, BOOK: #{book.name}, PATH: #{path}"
-        else
-          abort "Note #{title} does not exist in book #{book.name}."
-        end
-      else
-        abort "Book #{book.name} does not exist."
-      end
+      File.delete(path) if File.exist?(path)
     end
 
     def edit
-      if Dir.exist?(book.path)
-        if File.exist?(path)
-          editor = TTY::Editor.new.open(path)
-          puts "NOTE EDITED: #{title}, PATH: #{path}"
-        else
-          abort "Note #{title} does not exist in book #{book.name}."
-        end
-      else
-        abort "Book #{book.name} does not exist."
-      end
+      TTY::Editor.new.open(path) if File.exist?(path)
     end
 
     def retitle(new_title)
-      if !RN::Validators.valid_Name?(new_title)
-        abort "Note title \"#{new_title}\" contains forbidden character."
-      end
-      if Dir.exist?(book.path)
-        if File.exist?(path)
-          if not File.exist?("#{book.path}#{new_title}.rn")
-            File.rename(path,"#{book.path}#{new_title}.rn")
-            old_title=title
-            self.title=new_title
-            puts "NOTE RENAMED: #{old_title} ->> #{title}, PATH: #{path}"
-          else
-            abort "Note #{new_title} already exists in book #{book.name}."
-          end
-        else
-          abort "Note #{title} does not exist in book #{book.name}."
-        end
-      else
-        abort "Book #{book.name} does not exist."
+      if File.exist?(path)
+        File.rename(path, "#{book.path}#{new_title}.rn")
+        self.title = new_title
       end
     end
 
     def show_note
-      if Dir.exist?(book.path)
-        if File.exist?(path)
-          File.open(path).each { |line| puts line}
-        else
-          abort "Note #{title} does not exist in book #{book.name}."
-        end
-      else
-        abort "Book #{book.name} does not exist."
-      end
+      File.open(path).each { |line| puts line} if File.exist?(path)
     end
 
     def convert
@@ -123,21 +71,12 @@ module RN
     end
 
     def export(export_path = "#{book.path}.exported/")
-      if Dir.exist?(book.path)
-        if File.exist?(Dir["#{no_extention_path}.*"][0])
-          if !File.exist?("#{export_path}#{title}.html")
-            md = convert
-            Dir.mkdir(export_path) unless Dir.exist?(export_path)
-            File.open("#{export_path}#{title}.html", 'w') { |file| file.write md }
-            puts "NOTE EXPORTED: #{title}, PATH: #{export_path}#{title}.html"
-          else
-            puts "File #{title} already exported. PATH: #{export_path}#{title}.html"
-          end
-        else
-          abort "Note #{title} does not exist in book #{book.name}."
-        end
-      else
-        abort "Book #{book.name} does not exist."
+      abort unless Dir.exist?(book.path)
+      abort unless File.exist?(Dir["#{no_extention_path}.*"][0])
+      unless File.exist?("#{export_path}#{title}.html")
+        md = convert
+        Dir.mkdir(export_path) unless Dir.exist?(export_path)
+        File.open("#{export_path}#{title}.html", 'w') { |file| file.write md }
       end
     end
   end
