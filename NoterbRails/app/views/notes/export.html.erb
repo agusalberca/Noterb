@@ -1,0 +1,18 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @note.title %>
+</p>
+
+<p>
+  <strong>Content:</strong>
+  <%= @note.content %>
+</p>
+
+<p>
+  <strong>Book:</strong>
+  <%= link_to @note.book, book_path(@note.book) %>
+</p>
+
+<%= link_to 'Back', notes_path %>

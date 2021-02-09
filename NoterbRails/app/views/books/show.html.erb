@@ -1,0 +1,40 @@
+<p id="notice" class="alert alert-dark"><%= notice %></p>
+<h1>
+  <strong>Book name:</strong>
+  <%= @book.name %>
+</h1>
+
+<% if @notes.count == 0 %>
+  <h3> This book has no notes.</h3>
+<% else %>
+  <h3>Notes</h3>
+
+  <table class="table table-striped table-hover table-bordered table-responsive">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Content</th>
+      <th colspan="3"></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <% @notes.each do |note| %>
+      <tr>
+        <td><div class = "content-td"><%= link_to note.title, note_path(note) %></div></td>
+        <td><div class = "content-td"><%= note.content %></div></td>
+        <td><%= link_to 'Show', note %></td>
+        <td><%= link_to 'Edit', edit_note_path(note) %></td>
+        <td><%= link_to 'Destroy', note, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+<% end %>
+
+<% if !@book.global? %>
+  <%= link_to 'Edit', edit_book_path(@book) %> |
+<% end %>
+<%= link_to 'New Note', new_note_path %>
+<%= link_to 'Back', books_path %>
