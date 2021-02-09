@@ -22,6 +22,19 @@
     max-height: 3rem;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-
+}
+.hidden{
+    display: none;
+}
+.general-container{
+    text-align: center;
+    margin: 3rem;
+}
+.home-btns{
+    margin: 1rem;
+}
+textarea {
+    resize: both !important;
+    height: 12rem;
+    width: 40rem;
 }
